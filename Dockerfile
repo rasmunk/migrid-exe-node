@@ -2,6 +2,7 @@ FROM centos:centos7
 
 ARG USER=mig
 ARG FUSE_GID=599
+ARG DEV_MODE=1
 
 USER root
 WORKDIR /root
@@ -24,6 +25,9 @@ RUN echo -e "\n\n\n" | ssh-keygen -t rsa -N '' \
 # Require only regular rsa key for sshd
 RUN sed 's/HostKey \/etc\/ssh\/ssh_host_ecdsa_key/#HostKey \/etc\/ssh\/ssh_host_ecdsa_key/g' -i /etc/ssh/sshd_config \
 	&& sed 's/HostKey \/etc\/ssh\/ssh_host_ed25519_key/#HostKey \/etc\/ssh\/ssh_host_ed25519_key/g' -i /etc/ssh/sshd_config
+
+# If def mode, disable StrictHostKeyChecking ssh checking
+RUN if [ $DEV_MODE -eq 0 ]; then sed 's/#   StrictHostKeyChecking ask/StrictHostKeyChecking no/g' -i /etc/ssh/ssh_config; fi
 
 RUN adduser $USER
 USER $USER
