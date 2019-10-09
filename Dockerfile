@@ -29,7 +29,9 @@ RUN adduser $USER
 USER $USER
 WORKDIR /home/$USER
 
-RUN echo -e "\n\n\n" | ssh-keygen -t rsa -N ''
+RUN echo -e "\n\n\n" | ssh-keygen -t rsa -N '' \
+    && touch .ssh/authorized_keys \
+    && chmod 644 .ssh/authorized_keys
 
 USER root
 WORKDIR /root

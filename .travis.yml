@@ -1,0 +1,24 @@
+sudo: required
+dist: trusty
+services: docker
+
+env:
+  matrix:
+    - VERSION=latest
+    - VERSION=dev
+
+  global:
+    - COMMIT=${TRAVIS_COMMIT::12}
+
+script:
+  - travis_wait 20 make build TAG=${VERSION}
+
+before_deploy:
+  - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+# deploy_notebook uses COMMIT and RELEASE_VERS envars
+deploy:
+  provider: script
+  script: bash deploy_notebook.sh
+
+notifications:
+  slack: raz-s:se1PurXsQJv03nBZa9XWMOOS
