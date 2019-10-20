@@ -47,18 +47,13 @@ RUN echo -e "\n\n\n" | ssh-keygen -t rsa -N '' \
 
 USER root
 
-COPY notebook_parameterizer /home/$USER/notebook_parameterizer
-RUN chown -R $USER:$USER /home/$USER/notebook_parameterizer
+COPY notebook_parameterizer /app/notebook_parameterizer
+RUN cd /app/notebook_parameterizer \
+    && python3 setup.py install
 
-USER $USER
-RUN cd /home/$USER/notebook_parameterizer \
-    && python3 setup.py install --user
-
-USER root
 WORKDIR /root
 
 ENV LC_ALL="en_US.UTF-8"
-ENV PATH="/home/$USER/.local/bin:$PATH"
 # Add Tini
 ENV TINI_VERSION v0.18.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini

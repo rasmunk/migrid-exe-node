@@ -9,7 +9,8 @@ this_path = os.path.dirname(__file__)
 
 def run(notebook_path,
         parameters_path,
-        output_notebook_path=None
+        output_notebook_path=None,
+        expand_env_values=False
         ):
     if not os.path.exists(notebook_path):
         return -1
@@ -43,10 +44,18 @@ def run(notebook_path,
             if "=" in line:
                 d_line = list(map(lambda x: x.replace(' ', ''),
                                   line.split('=')))
-                # Matching parameter
+                # Matching parameter name
                 if len(d_line) == 2 and d_line[0] in parameters:
+                    value = parameters[d_line[0]]
+                    # Whether to expand value from os env
+                    if expand_env_values and isinstance(value, str) and \
+                            value.startswith("ENV_"):
+                        env_var = value.replace("ENV_", "")
+                        value = os.getenv(
+                            env_var,
+                            "MISSING ENVIRONMENT VARIABLE: {}".format(env_var))
                     lines[idy] = translator.assign(
-                        d_line[0], translator.translate(parameters[d_line[0]]))
+                        d_line[0], translator.translate(value))
 
                     cell_updated = True
         if cell_updated:
@@ -67,5 +76,7 @@ def run(notebook_path,
 
 
 if __name__ == "__main__":
-    _, notebook_path, parameters_path, output_notebook_path = sys.argv
-    run(notebook_path, parameters_path, output_notebook_path)
+    _, notebook_path, parameters_path, output_notebook_path, expand_env_values\
+        = sys.argv
+    run(notebook_path, parameters_path, output_notebook_path,
+        expand_env_values)
