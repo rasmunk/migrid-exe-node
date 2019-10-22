@@ -24,7 +24,8 @@ RUN pip3 install \
     numpy \
     matplotlib \
     scikit-image \
-    torch
+    torch \
+    notebook_parameterizer
 
 RUN echo -e "\n\n\n" | ssh-keygen -t rsa -N '' \
 	&& ln -s /root/.ssh/id_rsa /etc/ssh/ssh_host_rsa_key
@@ -46,11 +47,6 @@ RUN echo -e "\n\n\n" | ssh-keygen -t rsa -N '' \
     && cat .ssh/id_rsa.pub >> .ssh/authorized_keys
 
 USER root
-
-COPY notebook_parameterizer /app/notebook_parameterizer
-RUN cd /app/notebook_parameterizer \
-    && python3 setup.py install
-
 WORKDIR /root
 
 ENV LC_ALL="en_US.UTF-8"
